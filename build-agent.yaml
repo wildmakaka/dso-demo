@@ -7,52 +7,68 @@ spec:
   containers:
     - name: maven
       image: maven:alpine
-      command:
-        - cat
+      command: ["cat"]
       tty: true
       volumeMounts:
         - name: m2
           mountPath: /root/.m2/
-    - name: docker-tools
-      image: rmkanda/docker-tools:latest
-      command:
-        - cat
-      tty: true
-      volumeMounts:
-        - mountPath: /var/run
-          name: docker-sock
-        - mountPath: /tmp/trivycache/
-          name: trivycache
+        - name: workspace
+          mountPath: /home/jenkins/agent
+    
     - name: kaniko
       image: gcr.io/kaniko-project/executor:v1.6.0-debug
       imagePullPolicy: Always
-      command:
-        - sleep
-      args:
-        - 99d
+      command: ["sleep"]
+      args: ["999999"]
       volumeMounts:
         - name: jenkins-docker-cfg
-          mountPath: /kaniko/.docker  
+          mountPath: /kaniko/.docker
+        - name: workspace
+          mountPath: /home/jenkins/agent
+    
+    # Обязательный контейнер для подключения к Jenkins
+    - name: jnlp
+      image: jenkins/inbound-agent:latest
+      args: ["$(JENKINS_SECRET)", "$(JENKINS_NAME)"]
+      volumeMounts:
+        - name: workspace
+          mountPath: /home/jenkins/agent
+    
+    # Опциональные контейнеры (можно удалить если не используются)
+    - name: docker-tools
+      image: rmkanda/docker-tools:latest
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: workspace
+          mountPath: /home/jenkins/agent
+    
     - name: trufflehog
       image: rmkanda/trufflehog
-      command:
-        - cat
+      command: ["cat"]
       tty: true
+      volumeMounts:
+        - name: workspace
+          mountPath: /home/jenkins/agent
+    
     - name: licensefinder
       image: licensefinder/license_finder
-      command:
-        - cat
+      command: ["cat"]
       tty: true
+      volumeMounts:
+        - name: workspace
+          mountPath: /home/jenkins/agent
+  
   volumes:
+    # Используем emptyDir вместо hostPath для переносимости
     - name: m2
-      hostPath:
-        path: /tmp/.m2/
-    - name: docker-sock
-      hostPath:
-        path: /var/run
-    - name: trivycache
-      hostPath:
-        path: /tmp/trivycache/
+      emptyDir: {}
+    
+    # Workspace volume (обязательный)
+    - name: workspace
+      emptyDir: {}
+    
+    # Docker registry credentials
     - name: jenkins-docker-cfg
       projected:
         sources:
@@ -61,3 +77,11 @@ spec:
               items:
                 - key: .dockerconfigjson
                   path: config.json
+    
+    # Опциональные volumes
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock
+    
+    - name: trivycache
+      emptyDir: {}
