@@ -2,52 +2,56 @@ pipeline {
   agent {
     kubernetes {
       yamlFile 'build-agent.yaml'
-      // УБЕРИТЕ ЭТУ СТРОКУ: defaultContainer 'maven'
+      defaultContainer 'maven'
       idleMinutes 1
     }
   }
-  
   stages {
     stage('Build') {
-      steps {
-        container('maven') {  // Явно указываем контейнер
-          sh 'mvn compile'
-        }
-      }
-    }
-    
-    stage('Test') {
-      steps {
-        container('maven') {  // Явно указываем контейнер
-          sh 'mvn test'
-        }
-      }
-    }
-    
-    stage('Create Jarfile') {
-      steps {
-        container('maven') {  // Явно указываем контейнер
-          sh 'mvn package -DskipTests'
-        }
-      }
-    }
-    
-    stage('Docker Build and Push') {
-      steps {
-        container('kaniko') {  // Теперь это будет работать
-          script {
-            // Проверяем что мы в контейнере kaniko
-            sh 'echo "Building Docker image..."'
-            
-            // Собираем с тегом
-            sh '''
-              /kaniko/executor \
-                -f Dockerfile \
-                -c . \
-                --destination=docker.io/webmakaka/dso-demo:latest
-            '''
+      parallel {
+        stage('Compile') {
+          steps {
+            container('maven') {
+              sh 'mvn compile'
+            }
           }
         }
+      }
+    }
+    stage('Test') {
+      parallel {
+        stage('Unit Tests') {
+          steps {
+            container('maven') {
+              sh 'mvn test'
+            }
+          }
+        }
+      }
+    }
+    stage('Package') {
+      parallel {
+        stage('Create Jarfile') {
+          steps {
+            container('maven') {
+              sh 'mvn package -DskipTests'
+            }
+          }
+        }
+        stage('Docker BnP') {
+            steps {
+                container('kaniko') {
+                    sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/webmakaka/dso-demo'
+                }
+            }
+        }
+      }
+    }
+
+    stage('Deploy to Dev') {
+      steps {
+        // TODO
+        sh "echo done"
       }
     }
   }
