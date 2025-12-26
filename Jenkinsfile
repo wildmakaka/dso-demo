@@ -30,28 +30,17 @@ pipeline {
       }
     }
     stage('Package') {
-      parallel {
-        stage('Create Jarfile') {
-          steps {
-            container('maven') {
-              sh 'mvn package -DskipTests'
-            }
-          }
-        }
-        stage('Docker BnP') {
-            steps {
-                container('kaniko') {
-                    sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/webmakaka/dso-demo'
-                }
-            }
+      steps {
+        container('maven') {
+          sh 'mvn package -DskipTests'
         }
       }
     }
-
-    stage('Deploy to Dev') {
+    stage('Build and Push Docker Image') {
       steps {
-        // TODO
-        sh "echo done"
+        container('kaniko') {
+          sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/webmakaka/dso-demo'
+        }
       }
     }
   }
