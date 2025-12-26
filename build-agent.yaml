@@ -17,11 +17,9 @@ spec:
     
     - name: kaniko
       # image: gcr.io/kaniko-project/executor:v1.6.0-debug
-      image: gcr.io/kaniko-project/executor:v1.19.2
-      imagePullPolicy: Always
-      command: ["cat"]
-      tty: true
-      args: []
+      image: gcr.io/kaniko-project/executor:v1.19.2-debug
+      command: ["sleep"]
+      args: ["999999"]
       volumeMounts:
         - name: jenkins-docker-cfg
           mountPath: /kaniko/.docker
