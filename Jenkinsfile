@@ -30,7 +30,7 @@ pipeline {
       }
     }
     stage('Package') {
-      parallel {
+      stages {
         stage('Create Jarfile') {
           steps {
             container('maven') {
@@ -38,12 +38,19 @@ pipeline {
             }
           }
         }
-        stage('Docker BnP') {
-            steps {
-                container('kaniko') {
-                    sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/webmakaka/dso-demo'
-                }
+        
+        stage('Docker Build and Push') {
+          steps {
+            container('kaniko') {
+              // Только после успешного создания jar
+              sh '''
+                /kaniko/executor \
+                  -f Dockerfile \
+                  -c . \
+                  --destination=docker.io/webmakaka/dso-demo
+              '''
             }
+          }
         }
       }
     }
