@@ -2,54 +2,50 @@ pipeline {
   agent {
     kubernetes {
       yamlFile 'build-agent.yaml'
-      defaultContainer 'maven'
+      // УБЕРИТЕ ЭТУ СТРОКУ: defaultContainer 'maven'
       idleMinutes 1
     }
   }
+  
   stages {
     stage('Build') {
-      parallel {
-        stage('Compile') {
-          steps {
-            container('maven') {
-              sh 'mvn compile'
-            }
-          }
+      steps {
+        container('maven') {  // Явно указываем контейнер
+          sh 'mvn compile'
         }
       }
     }
+    
     stage('Test') {
-      parallel {
-        stage('Unit Tests') {
-          steps {
-            container('maven') {
-              sh 'mvn test'
-            }
-          }
+      steps {
+        container('maven') {  // Явно указываем контейнер
+          sh 'mvn test'
         }
       }
     }
-    stage('Package') {
-      stages {
-        stage('Create Jarfile') {
-          steps {
-            container('maven') {
-              sh 'mvn package -DskipTests'
-            }
-          }
+    
+    stage('Create Jarfile') {
+      steps {
+        container('maven') {  // Явно указываем контейнер
+          sh 'mvn package -DskipTests'
         }
-        
-        stage('Docker Build and Push') {
-          steps {
-            container('kaniko') {
-              // Только после успешного создания jar
-              sh '''
-                /kaniko/executor \
-                  -f Dockerfile \
-                  -c . \
-                  --destination=docker.io/webmakaka/dso-demo
-              '''
-            }
+      }
+    }
+    
+    stage('Docker Build and Push') {
+      steps {
+        container('kaniko') {  // Теперь это будет работать
+          script {
+            // Проверяем что мы в контейнере kaniko
+            sh 'echo "Building Docker image..."'
+            
+            // Собираем с тегом
+            sh '''
+              /kaniko/executor \
+                -f Dockerfile \
+                -c . \
+                --destination=docker.io/webmakaka/dso-demo:latest
+            '''
           }
         }
       }
