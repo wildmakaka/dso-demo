@@ -16,8 +16,8 @@ spec:
           mountPath: /home/jenkins/agent
     
     - name: kaniko
-      image: gcr.io/kaniko-project/executor:v1.6.0-debug
-      # image: gcr.io/kaniko-project/executor:v1.19.2
+      # image: gcr.io/kaniko-project/executor:v1.6.0-debug
+      image: gcr.io/kaniko-project/executor:v1.19.2
       imagePullPolicy: Always
       command: ["sleep"]
       args: ["999999"]
