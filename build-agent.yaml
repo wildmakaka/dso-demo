@@ -14,6 +14,16 @@ spec:
           mountPath: /root/.m2/
         - name: workspace
           mountPath: /home/jenkins/agent
+
+    - name: maven:3.8.6-openjdk-11
+      image: maven:maven:3.8.6-openjdk-11
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: m2
+          mountPath: /root/.m2/
+        - name: workspace
+          mountPath: /home/jenkins/agent
     
     - name: kaniko
       # image: gcr.io/kaniko-project/executor:v1.6.0-debug
