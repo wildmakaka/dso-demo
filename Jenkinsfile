@@ -31,7 +31,7 @@ pipeline {
 
         stage('SCA') {
             steps {
-                container('maven:3.8.6-openjdk-11') {
+                container('maven') {
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         sh 'mvn org.owasp:dependency-check-maven:check'
                     }
