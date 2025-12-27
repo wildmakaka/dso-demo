@@ -19,8 +19,7 @@ pipeline {
       }
     }
 
-
-stage('Static Analysis') {
+    stage('Static Analysis') {
       parallel {
         stage('Unit Tests') {
           steps {
@@ -40,11 +39,12 @@ stage('Static Analysis') {
             }
             post {
                 always {
-                    archiveArtifacts
+                    archiveArtifacts(
                         allowEmptyArchive: true,
                         artifacts: 'target/dependency-check-report.html',
                         fingerprint: true,
                         onlyIfSuccessful: true
+                        )
                     // dependencyCheckPublisher pattern: 'report.xml'
                 }
             }
