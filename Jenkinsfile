@@ -78,10 +78,10 @@ pipeline {
         //                                      artifact: 'target/bom.xml',
         //                                      autoCreateProjects: true,
         //                                      synchronous: true
-        //             archiveArtifacts allowEmptyArchive: true,
+        //             archiveArtifacts (allowEmptyArchive: true,
         //                             artifacts: 'target/bom.xml',
         //                             fingerprint: true,
-        //                             onlyIfSuccessful: true
+        //                             onlyIfSuccessful: true)
         //         }
         //     }
         // }
@@ -89,7 +89,7 @@ pipeline {
               stage('SAST') {
                 steps {
                   container('slscan') {
-                    sh 'scan --type gava,depscan --build'
+                    sh 'scan --type java,depscan --build'
                   }
                 }
               
