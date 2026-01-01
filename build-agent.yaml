@@ -15,21 +15,11 @@ spec:
           mountPath: /root/.m2/
         - name: workspace
           mountPath: /home/jenkins/agent
-    # - name: slscan
-    #   image: shiftleft/sast-scan
-    #   imagePullPolicy: Always
-    #   command:
-    #     - cat
-    #   tty: true
 
     - name: slscan
-      image: shiftleft/sast-scan
+      image: shiftleft/sast-scan:latest
       imagePullPolicy: Always
-      command:
-      - /bin/sh
-      - -c
-      args:
-      - cat
+      command: ["cat"]
       tty: true
       
     - name: kaniko
