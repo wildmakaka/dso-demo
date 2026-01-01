@@ -88,7 +88,7 @@ pipeline {
         
               stage('SAST') {
                 steps {
-                  container('slscan') {
+                  container('maven') {
                     sh 'echo hello'
                   }
                 }
