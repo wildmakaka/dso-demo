@@ -18,9 +18,14 @@ spec:
 
     - name: slscan
       image: shiftleft/sast-scan:latest
-      imagePullPolicy: Always
+      #imagePullPolicy: Always
       command: ["cat"]
       tty: true
+      volumeMounts:
+        - name: m2
+          mountPath: /root/.m2/
+        - name: workspace
+          mountPath: /home/jenkins/agent
       
     - name: kaniko
       # image: gcr.io/kaniko-project/executor:v1.6.0-debug
