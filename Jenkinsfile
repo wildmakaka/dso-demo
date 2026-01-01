@@ -86,7 +86,24 @@ pipeline {
         //     }
         // }
         
-
+              stage('SAST') {
+                steps {
+                  container('stscan') {
+                    sh 'scan --type gava,depscan --build'
+                  }
+                }
+              
+                post {
+                  success {
+                    archiveArtifacts(
+                      allowEmptyArchive: true,
+                      artifacts: 'reports/*',
+                      fingerprint: true,
+                      onlyIfSuccessful: true
+                    )
+                  }
+                }
+              }
       }
     }
     
