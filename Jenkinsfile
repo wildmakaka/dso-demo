@@ -88,7 +88,7 @@ pipeline {
         
               stage('SAST') {
                 steps {
-                  container('sast-scan') {
+                  container('slscan') {
                     sh 'scan --type gava,depscan --build'
                   }
                 }
