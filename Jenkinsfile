@@ -114,12 +114,12 @@ pipeline {
         }
       }
     }
-    stage('Build and Push Docker Image') {
-      steps {
-        container('kaniko') {
-          sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/webmakaka/dso-demo'
-        }
-      }
-    }
+    // stage('Build and Push Docker Image') {
+    //   steps {
+    //     container('kaniko') {
+    //       sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/webmakaka/dso-demo'
+    //     }
+    //   }
+    // }
   }
 }
