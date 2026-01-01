@@ -90,7 +90,6 @@ pipeline {
                 steps {
                   container('slscan') {
                     sh 'echo hello'
-                    // sh 'scan --type java,depscan --build'
                   }
                 }
               
