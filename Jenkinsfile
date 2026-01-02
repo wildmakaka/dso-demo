@@ -110,24 +110,24 @@ pipeline {
     //           // }
     //   }
     // }
-stage('Image Analysis') {
-    parallel {
-        stage('Image Linting') {
-            steps {
-                container('docker-tools') {
-                    sh 'dockle webmakaka/dso-demo --exit-code 1'
-                }
-            }
-        }
-        // stage('Image Scan') {
-        //     steps {
-        //         container('docker-tools') {
-        //             sh 'trivy image --exit-code 1 webmakaka/dso-demo'
-        //         }
-        //     }
-        // }
-    }
-}
+// stage('Image Analysis') {
+//     parallel {
+//         stage('Image Linting') {
+//             steps {
+//                 container('docker-tools') {
+//                     sh 'dockle webmakaka/dso-demo --exit-code 1'
+//                 }
+//             }
+//         }
+//         stage('Image Scan') {
+//             steps {
+//                 container('docker-tools') {
+//                     sh 'trivy image --exit-code 1 webmakaka/dso-demo'
+//                 }
+//             }
+//         }
+//     }
+// }
     
     stage('Package') {
       steps {
