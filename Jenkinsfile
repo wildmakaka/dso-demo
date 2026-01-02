@@ -106,7 +106,6 @@ pipeline {
               // }
       }
     }
-
 stage('Image Analysis') {
     parallel {
         stage('Image Linting') {
@@ -119,7 +118,7 @@ stage('Image Analysis') {
         stage('Image Scan') {
             steps {
                 container('docker-tools') {
-                    sh 'trivy image webmakaka/dso-demo --exit-code 1'
+                    sh 'trivy image --exit-code 1 webmakaka/dso-demo'
                 }
             }
         }
