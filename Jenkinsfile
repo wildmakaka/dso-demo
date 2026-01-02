@@ -1,4 +1,7 @@
 pipeline {
+  environment {
+        ARGO_SERVER = 'argocd.192.168.49.2.nip.io'
+  }
   agent {
     kubernetes {
       yamlFile 'build-agent.yaml'
@@ -19,111 +22,111 @@ pipeline {
       }
     }
 
-    stage('Static Analysis') {
-      parallel {
-        stage('Unit Tests') {
-          steps {
-            container('maven') {
-              sh 'mvn test'
-            }
-          }
-        }
+    // stage('Static Analysis') {
+    //   parallel {
+    //     stage('Unit Tests') {
+    //       steps {
+    //         container('maven') {
+    //           sh 'mvn test'
+    //         }
+    //       }
+    //     }
 
-        // stage('SCA') {
-        //     steps {
-        //         container('maven') {
-        //             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-        //                 sh 'mvn org.owasp:dependency-check-maven:check'
-        //             }
-        //         }
-        //     }
-        //     post {
-        //         always {
-        //             archiveArtifacts(
-        //                 allowEmptyArchive: true,
-        //                 artifacts: 'target/dependency-check-report.html',
-        //                 fingerprint: true,
-        //                 onlyIfSuccessful: true
-        //                 )
-        //             // dependencyCheckPublisher pattern: 'report.xml'
-        //         }
-        //     }
-        // }
+    //     // stage('SCA') {
+    //     //     steps {
+    //     //         container('maven') {
+    //     //             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+    //     //                 sh 'mvn org.owasp:dependency-check-maven:check'
+    //     //             }
+    //     //         }
+    //     //     }
+    //     //     post {
+    //     //         always {
+    //     //             archiveArtifacts(
+    //     //                 allowEmptyArchive: true,
+    //     //                 artifacts: 'target/dependency-check-report.html',
+    //     //                 fingerprint: true,
+    //     //                 onlyIfSuccessful: true
+    //     //                 )
+    //     //             // dependencyCheckPublisher pattern: 'report.xml'
+    //     //         }
+    //     //     }
+    //     // }
 
-        // stage('OSS License Checker') {
-        //     steps {
-        //         container('licensefinder') {
-        //             sh 'ls -al'
-        //             sh '''#!/bin/bash --login
-        //                 /bin/bash --login
-        //                 rvm use default
-        //                 gem install license_finder
-        //                 license_finder
-        //             '''
-        //         }
-        //     }
-        // }
+    //     // stage('OSS License Checker') {
+    //     //     steps {
+    //     //         container('licensefinder') {
+    //     //             sh 'ls -al'
+    //     //             sh '''#!/bin/bash --login
+    //     //                 /bin/bash --login
+    //     //                 rvm use default
+    //     //                 gem install license_finder
+    //     //                 license_finder
+    //     //             '''
+    //     //         }
+    //     //     }
+    //     // }
 
 
-        // stage('Generate SBOM') {
-        //     steps {
-        //         container('maven') {
-        //             sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
-        //         }
-        //     }
-        //     post {
-        //         success {
-        //             dependencyTrackPublisher projectName: 'sample-spring-app',
-        //                                      projectVersion: '0.0.1',
-        //                                      artifact: 'target/bom.xml',
-        //                                      autoCreateProjects: true,
-        //                                      synchronous: true
-        //             archiveArtifacts (allowEmptyArchive: true,
-        //                             artifacts: 'target/bom.xml',
-        //                             fingerprint: true,
-        //                             onlyIfSuccessful: true)
-        //         }
-        //     }
-        // }
+    //     // stage('Generate SBOM') {
+    //     //     steps {
+    //     //         container('maven') {
+    //     //             sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+    //     //         }
+    //     //     }
+    //     //     post {
+    //     //         success {
+    //     //             dependencyTrackPublisher projectName: 'sample-spring-app',
+    //     //                                      projectVersion: '0.0.1',
+    //     //                                      artifact: 'target/bom.xml',
+    //     //                                      autoCreateProjects: true,
+    //     //                                      synchronous: true
+    //     //             archiveArtifacts (allowEmptyArchive: true,
+    //     //                             artifacts: 'target/bom.xml',
+    //     //                             fingerprint: true,
+    //     //                             onlyIfSuccessful: true)
+    //     //         }
+    //     //     }
+    //     // }
         
-              // stage('SAST') {
-              //   steps {
-              //     container('slscan') {
-              //       sh 'scan --type java,depscan --build'
-              //     }
-              //   }
+    //           // stage('SAST') {
+    //           //   steps {
+    //           //     container('slscan') {
+    //           //       sh 'scan --type java,depscan --build'
+    //           //     }
+    //           //   }
               
-              //   post {
-              //     success {
-              //       archiveArtifacts(
-              //         allowEmptyArchive: true,
-              //         artifacts: 'reports/*',
-              //         fingerprint: true,
-              //         onlyIfSuccessful: true
-              //       )
-              //     }
-              //   }
-              // }
-      }
-    }
-stage('Image Analysis') {
-    parallel {
-        stage('Image Linting') {
-            steps {
-                container('docker-tools') {
-                    sh 'dockle webmakaka/dso-demo --exit-code 1'
-                }
-            }
-        }
-        stage('Image Scan') {
-            steps {
-                container('docker-tools') {
-                    sh 'trivy image --exit-code 1 webmakaka/dso-demo'
-                }
-            }
-        }
-    }
-}
+    //           //   post {
+    //           //     success {
+    //           //       archiveArtifacts(
+    //           //         allowEmptyArchive: true,
+    //           //         artifacts: 'reports/*',
+    //           //         fingerprint: true,
+    //           //         onlyIfSuccessful: true
+    //           //       )
+    //           //     }
+    //           //   }
+    //           // }
+    //   }
+    // }
+// stage('Image Analysis') {
+//     parallel {
+//         stage('Image Linting') {
+//             steps {
+//                 container('docker-tools') {
+//                     sh 'dockle webmakaka/dso-demo --exit-code 1'
+//                 }
+//             }
+//         }
+//         stage('Image Scan') {
+//             steps {
+//                 container('docker-tools') {
+//                     sh 'trivy image --exit-code 1 webmakaka/dso-demo'
+//                 }
+//             }
+//         }
+//     }
+// }
     
     stage('Package') {
       steps {
@@ -139,5 +142,26 @@ stage('Image Analysis') {
     //     }
     //   }
     // }
+
+  stage('Deploy to Dev') {
+    environment {
+        AUTH_TOKEN = credentials('argocd-jenkins-deployer-token')
+    }
+    steps {
+        container('docker-tools') {
+            sh '''
+                docker run -t schoolofdevops/argocd-cli argocd app sync dso-demo \
+                    --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN
+
+                docker run -t schoolofdevops/argocd-cli argocd app wait dso-demo \
+                    --health --timeout 300 \
+                    --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN
+            '''
+        }
+    }
+}
+
+    
+    
   }
 }
