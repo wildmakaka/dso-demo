@@ -112,7 +112,7 @@ pipeline {
             stage('Image Linting') {
                 steps {
                     container('docker-tools') {
-                        sh 'dockle webmakaka/dsodemo'
+                        sh 'dockle webmakaka/dso-demo'
                     }
                 }
             }
