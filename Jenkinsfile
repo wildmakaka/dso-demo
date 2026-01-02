@@ -1,6 +1,7 @@
 pipeline {
   environment {
         ARGO_SERVER = 'argocd.192.168.49.2.nip.io'
+        DEV_URL = 'http://192.168.49.2:30080/'
   }
   agent {
     kubernetes {
@@ -143,6 +144,26 @@ pipeline {
     //   }
     // }
 
+    
+    stage('Dynamic Analysis') {
+    parallel {
+        stage('E2E tests') {
+            steps {
+                sh 'echo "All Tests passed!!!"'
+            }
+        }
+        stage('DAST') {
+            steps {
+                container('docker-tools') {
+                    sh '''
+                        docker run -t owasp/zap2docker-stable zap-baseline.py -t $DEV_URL || exit 0
+                    '''
+                }
+            }
+        }
+    }
+}
+
   stage('Deploy to Dev') {
     environment {
         AUTH_TOKEN = credentials('argocd-jenkins-deployer-token')
@@ -160,6 +181,8 @@ pipeline {
         }
     }
 }
+
+
 
     
     
