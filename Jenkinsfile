@@ -145,24 +145,7 @@ pipeline {
     // }
 
     
-    stage('Dynamic Analysis') {
-    parallel {
-        stage('E2E tests') {
-            steps {
-                sh 'echo "All Tests passed!!!"'
-            }
-        }
-        stage('DAST') {
-            steps {
-                container('docker-tools') {
-                    sh '''
-                        docker run -t owasp/zap2docker-stable zap-baseline.py -t $DEV_URL || exit 0
-                    '''
-                }
-            }
-        }
-    }
-}
+   
 
   stage('Deploy to Dev') {
     environment {
@@ -183,7 +166,24 @@ pipeline {
 }
 
 
-
+ stage('Dynamic Analysis') {
+    parallel {
+        stage('E2E tests') {
+            steps {
+                sh 'echo "All Tests passed!!!"'
+            }
+        }
+        stage('DAST') {
+            steps {
+                container('docker-tools') {
+                    sh '''
+                        docker run -t zaproxy/zap-stable zap-baseline.py -t $DEV_URL || exit 0
+                    '''
+                }
+            }
+        }
+    }
+}
     
     
   }
