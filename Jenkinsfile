@@ -68,27 +68,28 @@ pipeline {
     //     //     }
     //     // }
 
-
-    //     // stage('Generate SBOM') {
-    //     //     steps {
-    //     //         container('maven') {
-    //     //             sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
-    //     //         }
-    //     //     }
-    //     //     post {
-    //     //         success {
-    //     //             dependencyTrackPublisher projectName: 'sample-spring-app',
-    //     //                                      projectVersion: '0.0.1',
-    //     //                                      artifact: 'target/bom.xml',
-    //     //                                      autoCreateProjects: true,
-    //     //                                      synchronous: true
-    //     //             archiveArtifacts (allowEmptyArchive: true,
-    //     //                             artifacts: 'target/bom.xml',
-    //     //                             fingerprint: true,
-    //     //                             onlyIfSuccessful: true)
-    //     //         }
-    //     //     }
-    //     // }
+stage('Generate SBOM') {
+    steps {
+        container('maven') {
+            sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+        }
+    }
+    post {
+        success {
+            dependencyTrackPublisher (projectName: 'sample-spring-app',
+                                     projectVersion: '0.0.1',
+                                     artifact: 'target/bom.xml',
+                                     autoCreateProjects: true,
+                                     synchronous: true)
+            archiveArtifacts (
+                allowEmptyArchive: true,
+                artifacts: 'target/bom.xml',
+                fingerprint: true,
+                onlyIfSuccessful: true
+            )
+        }
+    }
+}
         
     //           // stage('SAST') {
     //           //   steps {
@@ -147,43 +148,43 @@ pipeline {
     
    
 
-  stage('Deploy to Dev') {
-    environment {
-        AUTH_TOKEN = credentials('argocd-jenkins-deployer-token')
-    }
-    steps {
-        container('docker-tools') {
-            sh '''
-                docker run -t schoolofdevops/argocd-cli argocd app sync dso-demo \
-                    --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN
+//   stage('Deploy to Dev') {
+//     environment {
+//         AUTH_TOKEN = credentials('argocd-jenkins-deployer-token')
+//     }
+//     steps {
+//         container('docker-tools') {
+//             sh '''
+//                 docker run -t schoolofdevops/argocd-cli argocd app sync dso-demo \
+//                     --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN
 
-                docker run -t schoolofdevops/argocd-cli argocd app wait dso-demo \
-                    --health --timeout 300 \
-                    --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN
-            '''
-        }
-    }
-}
+//                 docker run -t schoolofdevops/argocd-cli argocd app wait dso-demo \
+//                     --health --timeout 300 \
+//                     --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN
+//             '''
+//         }
+//     }
+// }
 
 
- stage('Dynamic Analysis') {
-    parallel {
-        stage('E2E tests') {
-            steps {
-                sh 'echo "All Tests passed!!!"'
-            }
-        }
-        stage('DAST') {
-            steps {
-                container('docker-tools') {
-                    sh '''
-                        docker run -t zaproxy/zap-stable zap-baseline.py -t $DEV_URL || exit 0
-                    '''
-                }
-            }
-        }
-    }
-}
+//  stage('Dynamic Analysis') {
+//     parallel {
+//         stage('E2E tests') {
+//             steps {
+//                 sh 'echo "All Tests passed!!!"'
+//             }
+//         }
+//         stage('DAST') {
+//             steps {
+//                 container('docker-tools') {
+//                     sh '''
+//                         docker run -t zaproxy/zap-stable zap-baseline.py -t $DEV_URL || exit 0
+//                     '''
+//                 }
+//             }
+//         }
+//     }
+// }
     
     
   }
