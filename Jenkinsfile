@@ -119,7 +119,7 @@ stage('Image Analysis') {
         stage('Image Scan') {
             steps {
                 container('docker-tools') {
-                    sh 'trivy webmakaka/dso-demo --exit-code 1'
+                    sh 'trivy image webmakaka/dso-demo --exit-code 1'
                 }
             }
         }
