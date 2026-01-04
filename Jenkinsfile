@@ -185,6 +185,16 @@ stage('Generate SBOM') {
 //         }
 //     }
 // }
+
+    stage('Scan k8s Deploy Code') {
+    steps {
+          container('docker-tools') {
+              sh 'kubesec scan deploy/dso-demo-deploy.yaml'
+          }
+        }
+    }
+
+
     
     
   }
